@@ -1,3 +1,4 @@
+// ============================================================================
 function ChannelConsole(enabled = true)
 {
 	this.enabled = enabled;
@@ -7,9 +8,19 @@ function ChannelConsole(enabled = true)
 	// -----------------------------------------
 	this.addChannel = function(channel_name)
 	{ 
+		var owner_console = this;
+
 		var new_channel = {};
 		new_channel["enabled"] = this.enabled;
 		this.channels[channel_name] = new_channel; 
+
+		// outward facing log function with channel name
+		this[channel_name] = function(message) {
+			var channel = this.channels[channel_name];
+			if (this.enabled && channel.enabled) {
+				console.log(`${channel_name}: `, message);
+			}
+		};
 	}
 
 	// -----------------------------------------
@@ -31,13 +42,7 @@ function ChannelConsole(enabled = true)
 	// -----------------------------------------
 	this.log = function(channel_name, message)
 	{
-		if (!this.channels[channel_name]) {
-			this.addChannel(channel_name, this.enabled);
-		}
-
-		if (this.enabled && this.isChannelEnabled(channel_name)) {
-			console.log(`${channel_name}: ` + message);
-		}
+		console.log("todo: switch channel " + channel_name + " to function");
 	}
 
 	return this;
@@ -45,9 +50,8 @@ function ChannelConsole(enabled = true)
 
 window.my_console = new ChannelConsole(true);
 window.my_console.addChannel("trace");
-window.my_console.setChannelEnabled("trace", false);
+window.my_console.addChannel("GFScraper");
 
-window.my_console.addChannel("notify");
 
 // ============================================================================
 // ----------------------------------------------------------------------------
@@ -55,7 +59,7 @@ window.my_console.addChannel("notify");
 // [ {name:string, link:string }, ...]
 function getGFJobs()
 {
-	window.my_console.log("trace", "getGFJobs()");
+	window.my_console.trace("getGFJobs()");
 
 	var jobs = []; 
 
@@ -80,14 +84,14 @@ function getGFJobs()
 };
 
 // ----------------------------------------------------------------------------
-// adds discovered GF jobs to jobs_container
+// adds discovered GF jobs to jobs_container, with name as key
 function addNewJobs(all_jobs, jobs_container)
 {
-	window.my_console.log("trace", "addNewJobs()");
+	window.my_console.trace("addNewJobs()");
 
 	all_jobs.forEach( function(cur_job) {
 		if (cur_job.name !== "" && !jobs_container[cur_job.name]) {
-			my_console.log("notify", `new job found: ${cur_job.name}`);
+			window.my_console.GFScraper(`new job found: ${cur_job.name}`);
 			jobs_container[cur_job.name] = { name:cur_job.name, link: cur_job.link };
 		}
 	});
@@ -98,7 +102,7 @@ function addNewJobs(all_jobs, jobs_container)
 // ----------------------------------------------------------------------------
 function scanForNewJobs(my_jobs_object)
 {
-	window.my_console.log("trace", "scanForNewJobs()");
+	window.my_console.trace("scanForNewJobs()");
 
 	const old_length = Object.keys(my_jobs_object).length;
 
@@ -112,8 +116,8 @@ function scanForNewJobs(my_jobs_object)
 	const new_length = Object.keys(my_jobs_object).length;
 
 	if (old_length !== new_length) {
-		window.my_console.log("notify", `   discovered ${new_length - old_length} new jobs`);
-		window.my_console.log("notify", `   total discovered: ${new_length}`);
+		window.my_console.GFScraper(`   discovered ${new_length - old_length} new jobs`);
+		window.my_console.GFScraper(`   total discovered: ${new_length}`);
 	}
 }
 
@@ -121,14 +125,14 @@ function scanForNewJobs(my_jobs_object)
 // adds scroll handler that will watch for and add new jobs to my_jobs_array
 function installScrollHandler(my_jobs_object)
 {
-	window.my_console.log("trace", "installScrollHandler()");
+	window.my_console.trace("installScrollHandler()");
 
 	$(window).on('scroll', function() 
 	{ 
 		scanForNewJobs(my_jobs_object);
 	});
 
-	window.my_console.log("notify", "scroll handler installed");
+	window.my_console.GFScraper("scroll handler installed");
 }
 
 // ----------------------------------------------------------------------------
@@ -137,7 +141,7 @@ function installScrollHandler(my_jobs_object)
 //	jobs: { name:{name:string, link:string}, ... }
 function jobsToString(jobs)
 {
-	window.my_console.log("trace", "jobsToString()");
+	window.my_console.trace("jobsToString()");
 
 	var toString = "";
 	Object.keys(jobs).forEach( function(cur_job_key) {
@@ -152,9 +156,9 @@ function jobsToString(jobs)
 // ----------------------------------------------------------------------------
 function startJobWatch() 
 {
-	window.my_console.log("trace", "startJobWatch()");
+	window.my_console.trace("startJobWatch()");
 
-	window.my_console.log("notify", "staring job watch...");
+	window.my_console.GFScraper("staring job watch...");
 
 	window.my_jobs = {};
 
@@ -162,7 +166,7 @@ function startJobWatch()
 
 	installScrollHandler(window.my_jobs);
 
-	window.my_console.log("notify", "now watching for new jobs");
+	window.my_console.GFScraper("now watching for new jobs");
 }
 
 
