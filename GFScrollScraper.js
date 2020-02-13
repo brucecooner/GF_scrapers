@@ -1,4 +1,32 @@
 // ============================================================================
+// GF dashboard scraper
+// scrapes GlowForge job links from page, updates list as page is scrolled,
+// can output discovered lists to console in tabular form
+// ============================================================================
+// usage: 
+// * log in to your Glowforge dashboard
+// * open browser developer console
+// * paste this ENTIRE file into the console and press enter
+// * follow instructions that appear in console
+
+// =============================== USE AND LICENSING INFO ===============================
+// USE THIS SOFTWARE AT YOUR OWN RISK! If you mess up your stuff, I'm not responsible.
+// No warranty is expressed nor implied, and this software may cease to function at any time due to unforeseen changes.
+// This software is NOT endorsed in any way by The Glowforge corporation, and is offered on an as-is basis for personal, non-commercial use ONLY.
+// This software may NOT be distributed or altered and re-distributed without the author's consent, and may NOT be incorporated into commerical projects.
+
+
+// ============================================================================
+// tiny channel-aware console log
+// create: my_console = new ChannelConsole();
+// make a channel: my_console.addChannel("trace");
+// make lots of channels!
+// make a channel: my_console.addChannel("todo");
+// use channels by calling their name:
+// my_console.trace("someFunctionName()");
+// my_console.todo("optimize this func.");
+// silence a channel:
+// my_console.setChannelEnabled("trace", false);
 function ChannelConsole(enabled = true)
 {
 	this.enabled = enabled;
@@ -50,10 +78,12 @@ function ChannelConsole(enabled = true)
 
 window.my_console = new ChannelConsole(true);
 window.my_console.addChannel("trace");
+window.my_console.setChannelEnabled("trace", false);
 window.my_console.addChannel("GFScraper");
 
 
 // ============================================================================
+// GF dashboard scraper
 // ----------------------------------------------------------------------------
 // returns array of discovered jobs
 // [ {name:string, link:string }, ...]
@@ -154,11 +184,11 @@ function jobsToString(jobs)
 };
 
 // ----------------------------------------------------------------------------
-function startJobWatch() 
+function startScrollScraper() 
 {
-	window.my_console.trace("startJobWatch()");
+	window.my_console.trace("startScrollScraper()");
 
-	window.my_console.GFScraper("staring job watch...");
+	window.my_console.GFScraper("starting job watch...");
 
 	window.my_jobs = {};
 
@@ -168,6 +198,21 @@ function startJobWatch()
 
 	window.my_console.GFScraper("now watching for new jobs");
 }
+
+// ----------------------------------------------------------------------------
+function getJobsTable()
+{
+	var tableString = jobsToString(window.my_jobs);
+
+	console.log(tableString);
+}
+
+window.my_console.GFScraper("1. type startScrollScraper() when ready to begin");
+window.my_console.GFScraper("2. scroll slowly through all your jobs in the dashboard.");
+window.my_console.GFScraper("(you should see updates from the scraper as you scroll)");
+window.my_console.GFScraper("2. upon reaching the bottom of your job list, type getJobsTable() in the console.");
+window.my_console.GFScraper("3. copy the (possibly large) string from the developer console and paste into an empty google sheet.");
+window.my_console.GFScraper("(it may work with other spreadsheets, has only been tested with G sheets)");
 
 
 
